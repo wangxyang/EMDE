@@ -131,6 +131,6 @@ FileList.propTypes = {
     onFileClick: PropTypes.func,
     onFileDelete: PropTypes.func,
     onSaveEdit: PropTypes.func,
-  }
+}
 
 export default FileList
