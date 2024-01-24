@@ -38,11 +38,11 @@ const FileSearch = ({ title, onFileSearch}) => {
     }
 
     return (
-        <div className="alert alert-primary d-flex justify-content-between align-items-center bg-light">
+        <div className="alert alert-primary d-flex justify-content-between align-items-center bg-primary">
             {
                 !inputActive && 
                 <>
-                    <span style={{ height: '30px' }}>{title}</span>
+                    <span style={{ height: '30px', color: '#FFFFFF', fontWeight: 'bolder' }}>{title}</span>
                     <button
                         type="button"
                         className="icon-button"
