@@ -9,7 +9,7 @@ function App() {
       <div className='row'>
         <div className='col-3 bg-light left-panel'>
             <FileSearch 
-              title= '我的文档'
+              title = '我的文档'
               onFileSearch = {(value) => {console.log(value)}}
             />
         </div>

@@ -3,6 +3,7 @@ import React, {useState, useEffect, useRef} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { PropTypes } from "prop-types";
 
 const FileSearch = ({ title, onFileSearch}) => {
     const [ inputActive, setInputActive ] = useState(false) //是否输入状态
@@ -51,7 +52,7 @@ const FileSearch = ({ title, onFileSearch}) => {
                         className="icon-button"
                         onClick={() =>{setInputActive(true)}}
                     >    
-                    <FontAwesomeIcon icon={faMagnifyingGlass} title="搜索" size="md" />
+                    <FontAwesomeIcon icon={faMagnifyingGlass} title="搜索" size="lg" />
                     </button>
                 </>
             }
@@ -80,5 +81,16 @@ const FileSearch = ({ title, onFileSearch}) => {
         </div>
     )
 }
+
+//增加react自带的prop-types属性检查
+FileSearch.propTypes = {
+    title: PropTypes.string,
+    onFileSearch: PropTypes.func.isRequired
+}
+//增加默认参数
+FileSearch.defaultProps = {
+    title: '我的文档'
+}
+
 
 export default FileSearch
