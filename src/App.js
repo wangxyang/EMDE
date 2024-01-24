@@ -1,6 +1,8 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import FileSearch from './components/FileSearch';
+import FileList from './components/FileList';
+import defaultFiles from './utils/defaultFile';
 
 function App() {
   return (
@@ -12,9 +14,12 @@ function App() {
               title = '我的文档'
               onFileSearch = {(value) => {console.log(value)}}
             />
+            <FileList 
+              files={defaultFiles}
+            />
         </div>
         <div className='col-9 bg-info right-panel'>
-            col-9 
+            这是一个组件 
         </div>
       </div>
     </div>
