@@ -1,24 +1,34 @@
-//左侧菜单-文件列表组件
 import React, {useState, useEffect, useRef} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPen, faBan, faNewspaper, faXmark, faCheck} from '@fortawesome/free-solid-svg-icons'
 import { PropTypes } from "prop-types";
+import useKeyPress from "../hooks/useKeyPress";
 
+/**
+ * 左侧菜单-文件列表组件
+ * @param {文档列表} files 
+ * @param {点击文件} onFileClick 
+ * @param {保存编辑} onSaveEdit 
+ * @param {删除文件} onFileDelete 
+ * @returns 
+ */
 const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
     const [ editStatus, setEditStatus] = useState(false)
     const [ value, setValue ] = useState('')
+    const enterPress = useKeyPress(13) //enter键位
+    const escPress = useKeyPress(27) //esc键位
     let node = useRef(null)
     
     //关闭重命名编辑器
-    const cancleEdit = (event) => {
-        event.preventDefault()
+    const cancleEdit = () => {
+        //event.preventDefault()
         setEditStatus(false)
         setValue('')
     }
 
     //完成重命名编辑
-    const completeEdit = (event) => {
-        event.preventDefault()
+    const completeEdit = () => {
+        //event.preventDefault()
         setEditStatus(false)
         setValue('')
     }
@@ -31,24 +41,18 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
     },[editStatus])
 
     useEffect(() => {
-        //添加键盘响应事件 enter/esc
-        const handleInputEvent = (event) =>{
-            const { keyCode } = event
-            if(keyCode === 13 && editStatus){
-                //通过编辑状态id找到对应正在编辑的文件
-                const editItem = files.find(file => file.id === editStatus)
-                onSaveEdit(editItem.id, value)
-                //完成编辑
-                completeEdit(event)
-            }else if(keyCode === 27){
-                //取消编辑
-                cancleEdit(event)
-            }
+        if(enterPress && editStatus){
+            //通过编辑状态id找到对应正在编辑的文件
+            const editItem = files.find(file => file.id === editStatus)
+            onSaveEdit(editItem.id, value)
+            //完成编辑
+            completeEdit()
         }
-        document.addEventListener('keyup', handleInputEvent)
-        return () => {
-            document.removeEventListener('keyup', handleInputEvent)
+        if(escPress && editStatus){
+            //取消编辑
+            cancleEdit()
         }
+        
     })
 
     return (

@@ -4,25 +4,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { PropTypes } from "prop-types";
+import useKeyPress from "../hooks/useKeyPress";
 
 const FileSearch = ({ title, onFileSearch}) => {
     const [ inputActive, setInputActive ] = useState(false) //是否输入状态
     const [ value, setValue ] = useState('') //输入内容
+    const enterPress = useKeyPress(13) //enter键位
+    const escPress = useKeyPress(27) //esc键位
     let node = useRef(null)
 
     useEffect(() => {
-        //添加键盘响应事件 enter/esc
-        const handleInputEvent = (event) =>{
-            const { keyCode } = event
-            if(keyCode === 13 && inputActive){
-                onFileSearch(value)
-            }else if(keyCode === 27){
-                closeSearch(event)
-            }
+        if(enterPress && inputActive){
+            onFileSearch(value)
         }
-        document.addEventListener('keyup', handleInputEvent)
-        return () => {
-            document.removeEventListener('keyup', handleInputEvent)
+        if(escPress && inputActive){
+            closeSearch()
         }
     })
 
@@ -34,9 +30,9 @@ const FileSearch = ({ title, onFileSearch}) => {
     },[inputActive])
 
     //定义关闭搜索框事件
-    const closeSearch = (e) => {
+    const closeSearch = () => {
         //阻止默认行为
-        e.preventDefault()
+        //e.preventDefault()
         setInputActive(false)
         setValue('')
     }

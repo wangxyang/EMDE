@@ -1,4 +1,6 @@
-//主进程 main process文件 依赖electron 加载window并打开react默认访问地址及端口
+/**
+ * 主进程 main process文件 依赖electron 加载window并打开react默认访问地址及端口
+ */
 const { app, BrowserWindow} = require('electron')
 const isDev = require('electron-is-dev')
 
