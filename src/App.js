@@ -16,6 +16,9 @@ function App() {
             />
             <FileList 
               files={defaultFiles}
+              onFileDelete = {(id) => {console.log(id)}}
+              onFileClick = {(id) => {console.log(id)}}
+              onSaveEdit = {(id, newValue) => {console.log(id, newValue)}}
             />
         </div>
         <div className='col-9 bg-info right-panel'>
