@@ -24,3 +24,4 @@ yarn-error.log*
 
 # pack dist folder
 /dist
+package-lock.json
