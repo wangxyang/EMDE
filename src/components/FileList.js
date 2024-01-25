@@ -77,6 +77,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
                         key={file.id}
                     >
                         {
+                            //非编辑状态 且文件不为新创建
                             ((file.id !== editStatus) && !file.isNew) &&
                             <> 
                                 <span className="col-2" size='lg'>
@@ -105,7 +106,8 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
                             </>
                         }
                         {
-                             ((file.id === editStatus) && file.isNew) &&
+                            //编辑状态 且文件不为新状态
+                             (file.id === editStatus) &&
                              <> 
                                  <input
                                     className="col -8"
