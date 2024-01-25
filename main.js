@@ -10,7 +10,7 @@ app.on('ready', () => {
     //创建窗口 
     mainWindow = new BrowserWindow({
         width: 1024,
-        height: 680,
+        height: 720,
         webPreferences: {
             nodeIntegration: true, //主窗口允许使用node方法 包括文件系统和网络访问
         }
