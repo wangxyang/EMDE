@@ -10,31 +10,34 @@ import defaultFiles from './utils/defaultFile';
 import BottomBtn from './components/BottomBtn';
 import SimpleMDE from "react-simplemde-editor"
 import TabList from './components/TabList';
+import { flattenArr, objToArr } from './utils/helper'
+import { v4 as uuidv4 } from 'uuid';
 import { useState } from 'react';
 
 function App() {
   //全局最小单元state
-  const [ files, setFiles] = useState(defaultFiles)//读取本地文件
+  const [ files, setFiles ] = useState(flattenArr(defaultFiles))//读取本地文件
   const [ activeFileId, setActiveFileId ] = useState('')//当前编辑器打开展示的id(活跃文件id)
   const [ openedFilesIds, setOpenedFilesIds ] = useState([])//打开的文件id集合
   const [ unsavedFileIds, setUnsavedFileIds ] = useState([])//编辑状态未保存文件id集合
   const [ searchedFiles, setSearchedFiles ] = useState([])//搜索文件列表结果集合
 
+  const filesArr = objToArr(files)
   //获取通过打开的文件id集合匹配打开的对应文件
-  const openFiles = openedFilesIds.map(openId => {
-    return files.find(file => file.id === openId)
+  const openedFiles = openedFilesIds.map(openID => {
+    return files[openID]
   })
   //获取当前编辑器打开展示的文件(活跃文件)
-  const activeFile = files.find(file => file.id === activeFileId)
+  const activeFile = files[activeFileId]
   //定义文件列表集合
-  const filesArr = (searchedFiles.length > 0) ? searchedFiles : files
+  const fileListArr = (searchedFiles.length > 0) ? searchedFiles : filesArr
 
   /**
    * 反向数据流 各操作事件/方法app.js返回相应的数据到组件中处理
   */
   //左侧菜单---搜索文件列表
   const fileSearch = (keyword) => {
-    const newFiles = files.filter(file => file.title.includes(keyword))
+    const newFiles = filesArr.filter(file => file.title.includes(keyword))
     setSearchedFiles(newFiles)
   }
   //左侧菜单---点击左侧文件列表方法
@@ -49,20 +52,28 @@ function App() {
   }
   //左侧菜单---删除文件
   const deleteFile = (id) => {
-    const newfiles = files.filter(file => file.id !== id)
-    setFiles(newfiles)
+    delete files[id]
+    setFiles(files)
     //同时关闭tab页签
     tabClose(id)
   }
   //左侧菜单---编辑文件名称
   const saveEdit = (id, title) => {
-    const newFiles = files.map(file => {
-      if(file.id === id){
-        file.title = title
-      }
-      return file
-    })
-    setFiles(newFiles) 
+    const modifiedFile = { ...files[id], title, isNew: false }
+    setFiles({ ...files, [id]: modifiedFile})
+    
+  }
+  //左侧菜单---新建文件
+  const createFile = () => {
+    const uuid = uuidv4()
+    const newFile = {
+      id: uuid,
+      title: '',
+      body: '## 我的文档',
+      createdAt: new Date().getTime(),
+      isNew: true,
+    }
+    setFiles({ ...files, [uuid]: newFile })
   }
   //右侧tab页---点击右侧tab页签方法
   const tabClick= (fileId) => {
@@ -90,13 +101,8 @@ function App() {
   //编辑器---编辑文件(文件内容发生变更)
   const fileChange = (id, value) => {
     //更新文件内容
-    const newFiles = files.map(file => {
-      if(file.id === id){
-        file.body = value
-      }
-      return file
-    })
-    setFiles(newFiles)
+    const newFile = { ...files[id], body: value }
+    setFiles({ ...files, [id]: newFile })
     //更新未保存文件id
     if(!unsavedFileIds.includes(id)){
       setUnsavedFileIds([ ...unsavedFileIds, id ])
@@ -113,7 +119,7 @@ function App() {
               onFileSearch = {fileSearch}
             />
             <FileList 
-              files={filesArr}
+              files={fileListArr}
               onFileDelete = {deleteFile}
               onFileClick = {fileClick}
               onSaveEdit = {saveEdit}
@@ -124,6 +130,7 @@ function App() {
                   text = "新建"
                   colorClass="btn-primary"
                   icon = {faPlus}
+                  onBtnClick = {createFile}
                 />
               </div> 
               <div className="col">
@@ -144,7 +151,7 @@ function App() {
           { activeFile &&
             <>
               <TabList
-                files={openFiles}
+                files={openedFiles}
                 activeId={activeFileId}
                 unsaveIds={unsavedFileIds}
                 onTabClick={tabClick}

@@ -20,10 +20,14 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
     let node = useRef(null)
     
     //关闭重命名编辑器
-    const cancleEdit = () => {
+    const cancleEdit = (editItem) => {
         //event.preventDefault()
         setEditStatus(false)
         setValue('')
+        //如果当前文件是新建文件退出时需要删除当前文件
+        if(editItem.isNew){
+            onFileDelete(editItem.id)
+        }
     }
 
     //完成重命名编辑
@@ -41,19 +45,27 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
     },[editStatus])
 
     useEffect(() => {
-        if(enterPress && editStatus){
+        const editItem = files.find(file => file.id === editStatus)
+        if(enterPress && editStatus && value.trim() !== ''){
             //通过编辑状态id找到对应正在编辑的文件
-            const editItem = files.find(file => file.id === editStatus)
             onSaveEdit(editItem.id, value)
             //完成编辑
             completeEdit()
         }
         if(escPress && editStatus){
             //取消编辑
-            cancleEdit()
+            cancleEdit(editItem)
         }
-        
-    })
+    },[enterPress, escPress])
+
+    //新增文件重新设置
+    useEffect(() => {
+        const newFile = files.find(file => file.isNew)
+        if(newFile){
+            setEditStatus(newFile.id)
+            setValue(newFile.title)
+        }
+    }, [files])
 
     return (
         <ul className="list-group list-group-flush file-list ">
@@ -65,7 +77,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
                         key={file.id}
                     >
                         {
-                            (file.id !== editStatus) &&
+                            ((file.id !== editStatus) && !file.isNew) &&
                             <> 
                                 <span className="col-2" size='lg'>
                                     <FontAwesomeIcon icon={faNewspaper} size="lg" />
@@ -93,7 +105,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
                             </>
                         }
                         {
-                             (file.id === editStatus) &&
+                             ((file.id === editStatus) && file.isNew) &&
                              <> 
                                  <input
                                     className="col -8"
@@ -101,19 +113,24 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
                                     value={value}
                                     ref={node}
                                     onChange={(e) => {setValue(e.target.value)}}
+                                    placeholder="请输入文件名称"
                                  >
                                  </input>
                                  <button
                                      type="button"
                                      className="icon-button col-2"
                                      onClick={() => {setEditStatus(false); onSaveEdit(file.id, value)}}
-                                 >
-                                     <FontAwesomeIcon icon={faCheck} title="确定"/>
+                                 >  
+                                    {   
+                                        //仅当输入的value不为空 才出现确定
+                                        value.trim() !== '' &&
+                                        <FontAwesomeIcon icon={faCheck} title="确定"/>
+                                    }
                                  </button>
                                  <button
                                      type="button"
                                      className="icon-button col-2"
-                                     onClick={cancleEdit}
+                                     onClick={() => {cancleEdit(file)}}
                                  >
                                      <FontAwesomeIcon icon={faXmark} title="取消"/>
                                  </button>
