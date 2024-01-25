@@ -20,7 +20,7 @@ const FileSearch = ({ title, onFileSearch}) => {
         if(escPress && inputActive){
             closeSearch()
         }
-    })
+    },[enterPress, escPress])
 
     useEffect(() =>{
         //添加点击搜索后光标聚焦搜索框事件
@@ -35,6 +35,7 @@ const FileSearch = ({ title, onFileSearch}) => {
         //e.preventDefault()
         setInputActive(false)
         setValue('')
+        onFileSearch('')
     }
 
     return (

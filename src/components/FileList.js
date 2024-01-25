@@ -106,7 +106,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
                                  <button
                                      type="button"
                                      className="icon-button col-2"
-                                     onClick={() => {setEditStatus(false); onSaveEdit(file.id, {value})}}
+                                     onClick={() => {setEditStatus(false); onSaveEdit(file.id, value)}}
                                  >
                                      <FontAwesomeIcon icon={faCheck} title="确定"/>
                                  </button>
