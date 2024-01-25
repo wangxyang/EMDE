@@ -16,7 +16,7 @@ function App() {
     //container-fluid 栅格布局以12划分 根据编辑器布局定义raw 
     <div className="App container-fluid px-0">  
       <div className="row no-gutters">
-        <div className="col-3 bg-secondary left-panel">
+        <div className="col-3 bg-light left-panel">
             <FileSearch 
               title = "我的文档"
               onFileSearch = {(value) => {console.log(value)}}
@@ -27,7 +27,7 @@ function App() {
               onFileClick = {(id) => {console.log(id)}}
               onSaveEdit = {(id, newValue) => {console.log(id, newValue)}}
             />
-            <div className="row no-gutters">
+            <div className="row button-group no-gutters">
               <div className="col">
                 <BottomBtn 
                   text = "新建"
