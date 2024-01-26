@@ -76,41 +76,19 @@ const FileList = ({ files , icon, onFileClick, onSaveEdit, onFileDelete}) => {
                         key={file.id}
                     >
                         {
-                            //打开状态
-                            ((file.id !== editStatus) && !file.isNew && file.isOpened) &&
-                            <>                             
-                                <span className="col-2" size='lg'>
-                                     <FontAwesomeIcon icon={faFolderOpen} size="lg" />
-                                </span>
-                                <span 
-                                    className="col-6 c-link"
-                                    onClick={() => {onFileClick(file.id)}}
-                                >
-                                    {file.title}
-                                </span>   
-                                <button
-                                    type="button"
-                                    className="icon-button col-2"
-                                    onClick={() => {setEditStatus(file.id); setValue(file.title)}}
-                                >
-                                    <FontAwesomeIcon icon={faPen} title="编辑"/>
-                                </button>
-                                <button
-                                    type="button"
-                                    className="icon-button col-2"
-                                    onClick={() => {onFileDelete(file.id)}}
-                                >
-                                    <FontAwesomeIcon icon={faBan} title="删除" />
-                                </button> 
-                            </>
-                        }
-                        {
                             //非编辑状态 且文件不为新创建
-                            ((file.id !== editStatus) && !file.isNew && !file.isOpened) &&
-                            <>                             
-                                <span className="col-2" size='lg'>
-                                     <FontAwesomeIcon icon={faFolder} size="lg" />
-                                </span>
+                            ((file.id !== editStatus) && !file.isNew) &&
+                            <>       
+                                {   (file.isOpened) &&
+                                    <span className="col-2">
+                                        <FontAwesomeIcon icon={faFolderOpen} size="lg" style={{height: 17.5, weight: 20}}/>
+                                    </span>
+                                }                      
+                                {   (!file.isOpened) &&
+                                    <span className="col-2">
+                                        <FontAwesomeIcon icon={faFolder} size="lg" style={{height: 17.5, weight: 20}}/>
+                                    </span>
+                                }   
                                 <span 
                                     className="col-6 c-link"
                                     onClick={() => {onFileClick(file.id)}}
