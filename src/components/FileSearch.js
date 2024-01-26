@@ -49,7 +49,7 @@ const FileSearch = ({ title, onFileSearch}) => {
                         className="icon-button"
                         onClick={() =>{setInputActive(true)}}
                     >    
-                    <FontAwesomeIcon icon={faMagnifyingGlass} title="搜索" size="lg" />
+                    <FontAwesomeIcon icon={faMagnifyingGlass} style={{color: "#fafafa",}} title='搜索' size="lg"/>
                     </button>
                 </>
             }
@@ -71,7 +71,7 @@ const FileSearch = ({ title, onFileSearch}) => {
                         className="icon-button"
                         onClick={closeSearch}
                     >
-                    <FontAwesomeIcon icon={faXmark} title="关闭" size="lg" />
+                    <FontAwesomeIcon icon={faXmark} style={{color: "#fafafa",}} title="关闭" size="lg" />
                     </button>
                 </>
             }

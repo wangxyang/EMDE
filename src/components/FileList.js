@@ -1,9 +1,8 @@
 import React, {useState, useEffect, useRef} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen, faBan, faNewspaper, faXmark, faCheck} from '@fortawesome/free-solid-svg-icons'
+import { faPen, faBan, faFolder, faFolderOpen, faXmark, faCheck} from '@fortawesome/free-solid-svg-icons'
 import { PropTypes } from "prop-types";
 import useKeyPress from "../hooks/useKeyPress";
-
 /**
  * 左侧菜单-文件列表组件
  * @param {文档列表} files 
@@ -12,7 +11,7 @@ import useKeyPress from "../hooks/useKeyPress";
  * @param {删除文件} onFileDelete 
  * @returns 
  */
-const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
+const FileList = ({ files , icon, onFileClick, onSaveEdit, onFileDelete}) => {
     const [ editStatus, setEditStatus] = useState(false)
     const [ value, setValue ] = useState('')
     const enterPress = useKeyPress(13) //enter键位
@@ -77,11 +76,11 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
                         key={file.id}
                     >
                         {
-                            //非编辑状态 且文件不为新创建
-                            ((file.id !== editStatus) && !file.isNew) &&
-                            <> 
+                            //打开状态
+                            ((file.id !== editStatus) && !file.isNew && file.isOpened) &&
+                            <>                             
                                 <span className="col-2" size='lg'>
-                                    <FontAwesomeIcon icon={faNewspaper} size="lg" />
+                                     <FontAwesomeIcon icon={faFolderOpen} size="lg" />
                                 </span>
                                 <span 
                                     className="col-6 c-link"
@@ -106,7 +105,36 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete}) => {
                             </>
                         }
                         {
-                            //编辑状态 且文件不为新状态
+                            //非编辑状态 且文件不为新创建
+                            ((file.id !== editStatus) && !file.isNew && !file.isOpened) &&
+                            <>                             
+                                <span className="col-2" size='lg'>
+                                     <FontAwesomeIcon icon={faFolder} size="lg" />
+                                </span>
+                                <span 
+                                    className="col-6 c-link"
+                                    onClick={() => {onFileClick(file.id)}}
+                                >
+                                    {file.title}
+                                </span>   
+                                <button
+                                    type="button"
+                                    className="icon-button col-2"
+                                    onClick={() => {setEditStatus(file.id); setValue(file.title)}}
+                                >
+                                    <FontAwesomeIcon icon={faPen} title="编辑"/>
+                                </button>
+                                <button
+                                    type="button"
+                                    className="icon-button col-2"
+                                    onClick={() => {onFileDelete(file.id)}}
+                                >
+                                    <FontAwesomeIcon icon={faBan} title="删除" />
+                                </button> 
+                            </>
+                        }
+                        {
+                            //编辑状态
                              (file.id === editStatus) &&
                              <> 
                                  <input

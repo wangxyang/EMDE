@@ -49,6 +49,9 @@ function App() {
       //只有当前集合内不包含该id才能添加
       setOpenedFilesIds([ ...openedFilesIds, fileId ])
     }
+    //设置文件打开状态
+    const modifiedFile = { ...files[fileId], isOpened: true }
+    setFiles({ ...files, [fileId]: modifiedFile})
   }
   //左侧菜单---删除文件
   const deleteFile = (id) => {
@@ -72,6 +75,7 @@ function App() {
       body: '## 我的文档',
       createdAt: new Date().getTime(),
       isNew: true,
+      isOpened:false,
     }
     setFiles({ ...files, [uuid]: newFile })
   }
@@ -96,7 +100,9 @@ function App() {
       const unsaveWithoutCurrentIds = unsavedFileIds.filter(unsaveFileId => unsaveFileId !== id)
       setUnsavedFileIds(unsaveWithoutCurrentIds)
     }
-
+    //设置文件打开状态
+    const modifiedFile = { ...files[id], isOpened: false }
+    setFiles({ ...files, [id]: modifiedFile})
   }
   //编辑器---编辑文件(文件内容发生变更)
   const fileChange = (id, value) => {
