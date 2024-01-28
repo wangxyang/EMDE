@@ -6,7 +6,6 @@ import { faPlus, faFileImport, faSave} from '@fortawesome/free-solid-svg-icons'
 
 import FileSearch from './components/FileSearch';
 import FileList from './components/FileList';
-import defaultFiles from './utils/defaultFile';
 import BottomBtn from './components/BottomBtn';
 import SimpleMDE from "react-simplemde-editor"
 import TabList from './components/TabList';
@@ -18,7 +17,7 @@ import { useState } from 'react';
 const { join } = window.require('path') //文件路径
 const { remote } = window.require('electron')//remote是electron提供的renderer.js可以访问node.js方法
 const Store = window.require('electron-store') //electron提供的持久化类
-const fileStore = new Store({'name': 'Files Data'})//实例化electron-store
+const fileStore = new Store({'name': 'Files-Store-Data'})//实例化electron-store 设置本机存储文件
 //保存文件至store中(文档数据库)
 const saveFilesToStore = (files) => {
   //文件状态等信息 不需要存入 isNew, body, isOpened
@@ -78,21 +77,22 @@ function App() {
   }
   //左侧菜单---删除文件
   const deleteFile = (id) => {
-    delete files[id]
-    setFiles(files)
-    //同时关闭tab页签
-    tabClose(id)
+    fileHelper.deleteFile( files[id].path).then(() => {
+      delete files[id]
+      setFiles(files)
+      //持久化文件到本地
+      saveFilesToStore(files)
+      //同时关闭tab页签
+      tabClose(id)
+    })
   }
   //左侧菜单---编辑文件名称
   const saveEdit = (id, title, isNew) => {
-    console.log(title,'3');
     const newPath = join(saveLocation, `${title}.md`)
     const modifiedFile = { ...files[id], title, isNew: false, path: newPath}
     const newFiles = { ...files, [id]: modifiedFile}
     if(isNew){
       //新创建文件调用保存编辑方法后需要同步保存文件到本地
-      console.log(title,'4');
-      console.log(newPath,'5');
       fileHelper.writeFile(newPath, files[id].body).then(() => {
         setFiles(newFiles)
         //持久化文件

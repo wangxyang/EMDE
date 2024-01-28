@@ -11,7 +11,7 @@ import useKeyPress from "../hooks/useKeyPress";
  * @param {删除文件} onFileDelete 
  * @returns 
  */
-const FileList = ({ files ,onFileClick, onSaveEdit, onFileDelete}) => {
+const FileList = ( { files ,onFileClick, onSaveEdit, onFileDelete} ) => {
     const [ editStatus, setEditStatus] = useState(false)
     const [ value, setValue ] = useState('')
     const enterPress = useKeyPress(13) //enter键位
@@ -45,9 +45,7 @@ const FileList = ({ files ,onFileClick, onSaveEdit, onFileDelete}) => {
 
     useEffect(() => {
         const editItem = files.find(file => file.id === editStatus)
-        console.log(value, '1');
         if(enterPress && editStatus && value.trim() !== ''){
-            console.log(value, '2');
             //通过编辑状态id找到对应正在编辑的文件
             onSaveEdit(editItem.id, value, editItem.isNew)
             //完成编辑
@@ -72,14 +70,15 @@ const FileList = ({ files ,onFileClick, onSaveEdit, onFileDelete}) => {
         <ul className="list-group list-group-flush file-list ">
             {
                 files.map(file => (
-                     
+                    //判断id是否存在
+                    (file.id) &&
                     <li 
                         className="row list-group-item bg-light d-flex justify-content-between align-items-center mx-0"
                         key={file.id}
                     >
                         {
                             //非编辑状态 且文件不为新创建
-                            ((file.id !== editStatus) && !file.isNew) &&
+                            (file.id !== editStatus && !file.isNew) &&
                             <>       
                                 {   (file.isOpened) &&
                                     <span className="col-2">
@@ -115,7 +114,7 @@ const FileList = ({ files ,onFileClick, onSaveEdit, onFileDelete}) => {
                         }
                         {
                             //编辑状态
-                             (file.id === editStatus) &&
+                             (file.id === editStatus || file.isNew) &&
                              <> 
                                  <input
                                     className="col -8"
