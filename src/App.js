@@ -66,6 +66,14 @@ function App() {
   const fileClick = (fileId) => {
     //设置活跃文件id
     setActiveFileId(fileId)
+    //添加isLoad状态 避免重复读取文件
+    const currentFile = files[fileId]
+    if(!currentFile.isLoaded){
+      fileHelper.readFile(currentFile.path).then(value => {
+        const newFile = { ...files[fileId], body: value, isLoaded: true}
+        setFiles( { ...files, [fileId]: newFile} )
+      })
+    }
     //设置打开文件id集合
     if(!openedFilesIds.includes(fileId)){
       //只有当前集合内不包含该id才能添加
@@ -90,7 +98,8 @@ function App() {
   const saveEdit = (id, title, isNew) => {
     const newPath = join(saveLocation, `${title}.md`)
     const modifiedFile = { ...files[id], title, isNew: false, path: newPath}
-    const newFiles = { ...files, [id]: modifiedFile}
+    const newFiles = { ...files, [id]: modifiedFile} 
+    
     if(isNew){
       //新创建文件调用保存编辑方法后需要同步保存文件到本地
       fileHelper.writeFile(newPath, files[id].body).then(() => {
@@ -107,6 +116,7 @@ function App() {
         saveFilesToStore(newFiles)
       })
     }
+    
   }
   //左侧菜单---新建文件
   const createFile = () => {
@@ -117,7 +127,7 @@ function App() {
       body: '## 我的文档',
       createdAt: new Date().getTime(),
       isNew: true,
-      isOpened:false,
+      isOpened: false
     }
     setFiles({ ...files, [uuid]: newFile })
   }
@@ -142,9 +152,13 @@ function App() {
       const unsaveWithoutCurrentIds = unsavedFileIds.filter(unsaveFileId => unsaveFileId !== id)
       setUnsavedFileIds(unsaveWithoutCurrentIds)
     }
-    //设置文件打开状态
-    const modifiedFile = { ...files[id], isOpened: false }
-    setFiles({ ...files, [id]: modifiedFile})
+    //设置文件打开状态 (删除文件调用该方法时 不需要设置状态)
+    const filesArr = objToArr(files)
+    const isExistFile = filesArr.find(file => file.id === id)
+    if(isExistFile){
+      const modifiedFile = { ...files[id], isOpened: false }
+      setFiles({ ...files, [id]: modifiedFile})
+    }
   }
   //编辑器---编辑文件(文件内容发生变更)
   const fileChange = (id, value) => {

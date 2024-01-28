@@ -12,6 +12,7 @@ import useKeyPress from "../hooks/useKeyPress";
  * @returns 
  */
 const FileList = ( { files ,onFileClick, onSaveEdit, onFileDelete} ) => {
+    //console.log(files);
     const [ editStatus, setEditStatus] = useState(false)
     const [ value, setValue ] = useState('')
     const enterPress = useKeyPress(13) //enter键位
@@ -71,7 +72,7 @@ const FileList = ( { files ,onFileClick, onSaveEdit, onFileDelete} ) => {
             {
                 files.map(file => (
                     //判断id是否存在
-                    (file.id) &&
+                    //(file.id) &&
                     <li 
                         className="row list-group-item bg-light d-flex justify-content-between align-items-center mx-0"
                         key={file.id}
@@ -124,18 +125,19 @@ const FileList = ( { files ,onFileClick, onSaveEdit, onFileDelete} ) => {
                                     onChange={(e) => {setValue(e.target.value)}}
                                     placeholder="请输入文件名称"
                                  >
-                                 </input>
-                                 <button
-                                     type="button"
-                                     className="icon-button col-2"
-                                     onClick={() => {setEditStatus(false); onSaveEdit(file.id, value, file.isNew)}}
-                                 >  
+                                 </input>  
+                                <button
+                                    type="button"
+                                    className="icon-button col-2"
+                                    onClick={() => {setEditStatus(false); onSaveEdit(file.id, value, file.isNew)}}
+                                >  
                                     {   
                                         //仅当输入的value不为空 才出现确定
                                         value.trim() !== '' &&
                                         <FontAwesomeIcon icon={faCheck} title="确定"/>
                                     }
-                                 </button>
+                                </button>
+                                 
                                  <button
                                      type="button"
                                      className="icon-button col-2"
