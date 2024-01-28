@@ -11,7 +11,7 @@ import useKeyPress from "../hooks/useKeyPress";
  * @param {删除文件} onFileDelete 
  * @returns 
  */
-const FileList = ({ files , icon, onFileClick, onSaveEdit, onFileDelete}) => {
+const FileList = ({ files ,onFileClick, onSaveEdit, onFileDelete}) => {
     const [ editStatus, setEditStatus] = useState(false)
     const [ value, setValue ] = useState('')
     const enterPress = useKeyPress(13) //enter键位
@@ -45,9 +45,11 @@ const FileList = ({ files , icon, onFileClick, onSaveEdit, onFileDelete}) => {
 
     useEffect(() => {
         const editItem = files.find(file => file.id === editStatus)
+        console.log(value, '1');
         if(enterPress && editStatus && value.trim() !== ''){
+            console.log(value, '2');
             //通过编辑状态id找到对应正在编辑的文件
-            onSaveEdit(editItem.id, value)
+            onSaveEdit(editItem.id, value, editItem.isNew)
             //完成编辑
             completeEdit()
         }
@@ -127,7 +129,7 @@ const FileList = ({ files , icon, onFileClick, onSaveEdit, onFileDelete}) => {
                                  <button
                                      type="button"
                                      className="icon-button col-2"
-                                     onClick={() => {setEditStatus(false); onSaveEdit(file.id, value)}}
+                                     onClick={() => {setEditStatus(false); onSaveEdit(file.id, value, file.isNew)}}
                                  >  
                                     {   
                                         //仅当输入的value不为空 才出现确定
