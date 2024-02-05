@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPen, faBan, faFolder, faFolderOpen, faXmark, faCheck} from '@fortawesome/free-solid-svg-icons'
 import { PropTypes } from "prop-types";
 import useKeyPress from "../hooks/useKeyPress";
+import useContextMenu from "../hooks/useContextMenu";
+
 
 const { remote } = window.require('electron')//remote是electron提供的renderer.js可以访问node.js方法
 const { Menu, MenuItem } = remote //导入原生应用菜单
@@ -21,6 +23,7 @@ const FileList = ( { files ,onFileClick, onSaveEdit, onFileDelete} ) => {
     const [ value, setValue ] = useState('')
     const enterPress = useKeyPress(13) //enter键位
     const escPress = useKeyPress(27) //esc键位
+
     let node = useRef(null)
     
     //关闭重命名编辑器
@@ -41,43 +44,32 @@ const FileList = ( { files ,onFileClick, onSaveEdit, onFileDelete} ) => {
         setValue('')
     }
 
-    useEffect(() => {
-        //原生上下文菜单
-        const menu = new Menu()
-        menu.append(new MenuItem({
+    useContextMenu([
+        {
             //菜单项名称
             label: '打开',
             //点击回调函数
             click: () => {
                 console.log('打开');
             }
-        }))
-        menu.append(new MenuItem({
+        },
+        {
             //菜单项名称
             label: '重命名',
             //点击回调函数
             click: () => {
 
             }
-        }))
-        menu.append(new MenuItem({
+        },
+        {
             //菜单项名称
             label: '删除',
             //点击回调函数
             click: () => {
 
             }
-        }))
-
-        const handleContextMenu = (e) => {
-            //唤起原生菜单
-            menu.popup( { window: remote.getCurrentWindow() } ) 
         }
-        window.addEventListener('contextmenu', handleContextMenu)
-        return () =>{
-            window.removeEventListener('contextmenu', handleContextMenu)
-        }
-    })
+    ])
 
     useEffect(() =>{
         //添加点击搜索后光标聚焦搜索框事件
