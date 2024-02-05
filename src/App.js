@@ -14,7 +14,7 @@ import { flattenArr, objToArr } from './utils/helper'
 import { v4 as uuidv4 } from 'uuid';
 import { useState } from 'react';
 
-const { join } = window.require('path') //文件路径
+const { join, basename, extname, dirname } = window.require('path') //文件路径
 const { remote } = window.require('electron')//remote是electron提供的renderer.js可以访问node.js方法
 const Store = window.require('electron-store') //electron提供的数据持久化类
 const fileStore = new Store({'name': 'Files-Store-Data'})//实例化electron-store 设置本机存储文件
@@ -62,6 +62,7 @@ function App() {
     const newFiles = filesArr.filter(file => file.title.includes(keyword))
     setSearchedFiles(newFiles)
   }
+
   //左侧菜单---点击左侧文件列表方法
   const fileClick = (fileId) => {
     //设置活跃文件id
@@ -83,6 +84,7 @@ function App() {
     const modifiedFile = { ...files[fileId], isOpened: true }
     setFiles({ ...files, [fileId]: modifiedFile})
   }
+
   //左侧菜单---删除文件
   const deleteFile = (id) => {
     //判断文件是否存在 isNew文件不需要删除并持久化
@@ -91,10 +93,10 @@ function App() {
       //delete files[id]
       setFiles(afterDelete)
     } else {
-      fileHelper.deleteFile( files[id].path).then(() => {
-        const { [id]: value, ...afterDelete } = files
-        //delete files[id]
-        setFiles(afterDelete)
+      fileHelper.deleteFile( files[id].path ).then(() => {
+        //const { [id]: value, ...afterDelete } = files
+        delete files[id]
+        setFiles({ ...files })
         //持久化文件到本地
         saveFilesToStore(files)
         //同时关闭tab页签
@@ -102,12 +104,13 @@ function App() {
       })
     }
   }
+
   //左侧菜单---编辑文件名称
   const saveEdit = (id, title, isNew) => {
-    const newPath = join(saveLocation, `${title}.md`)
+    const newPath = isNew ? join(saveLocation, `${title}.md`) 
+    : join(dirname(files[id].path), `${title}.md`)
     const modifiedFile = { ...files[id], title, isNew: false, path: newPath}
     const newFiles = { ...files, [id]: modifiedFile} 
-    
     if(isNew){
       //新创建文件调用保存编辑方法后需要同步保存文件到本地
       fileHelper.writeFile(newPath, files[id].body).then(() => {
@@ -117,7 +120,7 @@ function App() {
       })
     }else{
       //非新创建文件及执行重命名操作
-      const oldPath = join(saveLocation, `${files[id].title}.md`)
+      const oldPath = files[id].path
       fileHelper.renameFile(oldPath, newPath).then(() => {
         setFiles(newFiles)
         //持久化文件
@@ -126,6 +129,7 @@ function App() {
     }
     
   }
+
   //左侧菜单---新建文件
   const createFile = () => {
     const uuid = uuidv4()
@@ -139,6 +143,7 @@ function App() {
     }
     setFiles({ ...files, [uuid]: newFile })
   }
+
   //左侧菜单---导入文件
   const importFiles = () => {
     remote.dialog.showOpenDialog({
@@ -151,9 +156,41 @@ function App() {
     }, (paths) => {
       if (Array.isArray(paths)){
         //过滤已经存在的文件
-
-        //扩展完善路径数组
-
+        const filteredPath = paths.filter(path => {
+          const alreadyAdded = Object.values(files).find(file => {
+            return file.path === path
+          })
+          return !alreadyAdded
+        })
+        //扩展完善路径数组 id tile path 
+        const importFileArr = filteredPath.map(path => {
+          return {
+            id: uuidv4(),
+            title: basename(path, extname(path)),
+            createdAt: new Date().getTime(),
+            path
+            
+          }
+        })
+        //设置新文件
+        const newFiles = { ...files, ...flattenArr(importFileArr) }
+        //持久化文件
+        setFiles(newFiles)
+        saveFilesToStore(newFiles)
+        //设置导入成功提示
+        if (importFileArr.length > 0 ){
+          remote.dialog.showMessageBox({
+            type: 'info',
+            title: '导入成功',
+            message: `成功导入${importFileArr.length}个文件`
+          })
+        } else{
+          remote.dialog.showMessageBox({
+            type: 'info',
+            title: '导入失败',
+            message: '请检查文件是否已存在'
+          })
+        }
       }
     })
   }
@@ -163,6 +200,7 @@ function App() {
     //设置活跃文件id
     setActiveFileId(fileId)
   }
+
   //右侧tab页---关闭右侧tab页签方法
   const tabClose = (id) => {
     //重新设置打开文件id集合
@@ -187,6 +225,7 @@ function App() {
       setFiles({ ...files, [id]: modifiedFile})
     }
   }
+
   //编辑器---编辑文件(文件内容发生变更)
   const fileChange = (id, value) => {
     //更新文件内容
@@ -197,9 +236,12 @@ function App() {
       setUnsavedFileIds([ ...unsavedFileIds, id ])
     }
   }
+
   //编辑器---保存当前文件的编辑
   const saveCurrentFile = () => {
-    fileHelper.writeFile(join(saveLocation, `${activeFile.title}.md`), activeFile.body).then(() => {
+    fileHelper.writeFile(activeFile.path,
+       activeFile.body
+    ).then(() => {
       setUnsavedFileIds(unsavedFileIds.filter(id => id !== activeFile.id))
     })
   }
