@@ -4,7 +4,7 @@ import { faPen, faBan, faFolder, faFolderOpen, faXmark, faCheck} from '@fortawes
 import { PropTypes } from "prop-types";
 import useKeyPress from "../hooks/useKeyPress";
 import useContextMenu from "../hooks/useContextMenu";
-
+import {getParentNode} from "../utils/helper"
 
 const { remote } = window.require('electron')//remote是electron提供的renderer.js可以访问node.js方法
 const { Menu, MenuItem } = remote //导入原生应用菜单
@@ -44,32 +44,34 @@ const FileList = ( { files ,onFileClick, onSaveEdit, onFileDelete} ) => {
         setValue('')
     }
 
-    useContextMenu([
+    const clickedItem = useContextMenu([
         {
             //菜单项名称
             label: '打开',
             //点击回调函数
             click: () => {
-                console.log('打开');
+                const parentElement = getParentNode(clickedItem.current, 'file-item')
+                if(parentElement){
+                    onFileClick(parentElement.dataset.id)
+                }
             }
         },
         {
-            //菜单项名称
             label: '重命名',
-            //点击回调函数
             click: () => {
-
+                const parentElement = getParentNode(clickedItem.current, 'file-item')
+                setEditStatus(parentElement.dataset.id); 
+                setValue(parentElement.dataset.title)
             }
         },
         {
-            //菜单项名称
             label: '删除',
-            //点击回调函数
             click: () => {
-
+                const parentElement = getParentNode(clickedItem.current, 'file-item')
+                onFileDelete(parentElement.dataset.id)
             }
         }
-    ])
+    ], '.file-list', [files])
 
     useEffect(() =>{
         //添加点击搜索后光标聚焦搜索框事件
@@ -108,8 +110,10 @@ const FileList = ( { files ,onFileClick, onSaveEdit, onFileDelete} ) => {
                     //判断id是否存在
                     //(file.id) &&
                     <li 
-                        className="row list-group-item bg-light d-flex justify-content-between align-items-center mx-0"
+                        className="row list-group-item bg-light d-flex justify-content-between align-items-center file-item mx-0"
                         key={file.id}
+                        data-id={file.id}
+                        data-title={file.title}
                     >
                         {
                             //非编辑状态 且文件不为新创建
@@ -126,12 +130,12 @@ const FileList = ( { files ,onFileClick, onSaveEdit, onFileDelete} ) => {
                                     </span>
                                 }   
                                 <span 
-                                    className="col-6 c-link"
+                                    className="col-10 c-link"
                                     onClick={() => {onFileClick(file.id)}}
                                 >
                                     {file.title}
                                 </span>   
-                                <button
+                                {/* <button
                                     type="button"
                                     className="icon-button col-2"
                                     onClick={() => {setEditStatus(file.id); setValue(file.title)}}
@@ -144,7 +148,7 @@ const FileList = ( { files ,onFileClick, onSaveEdit, onFileDelete} ) => {
                                     onClick={() => {onFileDelete(file.id)}}
                                 >
                                     <FontAwesomeIcon icon={faBan} title="删除" />
-                                </button> 
+                                </button>  */}
                             </>
                         }
                         {

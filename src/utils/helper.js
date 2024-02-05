@@ -10,6 +10,28 @@ export const flattenArr = (arr) => {
     }, {})
   }
   
-  export const objToArr = (obj) => {
-    return Object.keys(obj).map(key => obj[key])
+/**
+ * object对象转数组
+ * @param {*} obj 
+ * @returns 
+ */
+export const objToArr = (obj) => {
+  return Object.keys(obj).map(key => obj[key])
+}
+
+  /**
+   * 获取父节点属性
+   * @param {*} node 
+   * @param {*} parentClassName 
+   * @returns 
+   */
+export const getParentNode = (node, parentClassName) => {
+  let current = node
+  while(current !== null ) {
+    if(current.classList.contains(parentClassName)){
+      return current
+    }
+    current = current.parentNode
   }
+  return false
+}
