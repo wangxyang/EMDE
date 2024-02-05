@@ -16,7 +16,7 @@ import { useState } from 'react';
 
 const { join } = window.require('path') //文件路径
 const { remote } = window.require('electron')//remote是electron提供的renderer.js可以访问node.js方法
-const Store = window.require('electron-store') //electron提供的持久化类
+const Store = window.require('electron-store') //electron提供的数据持久化类
 const fileStore = new Store({'name': 'Files-Store-Data'})//实例化electron-store 设置本机存储文件
 //保存文件至store中(文档数据库)
 const saveFilesToStore = (files) => {
@@ -85,14 +85,22 @@ function App() {
   }
   //左侧菜单---删除文件
   const deleteFile = (id) => {
-    fileHelper.deleteFile( files[id].path).then(() => {
-      delete files[id]
-      setFiles(files)
-      //持久化文件到本地
-      saveFilesToStore(files)
-      //同时关闭tab页签
-      tabClose(id)
-    })
+    //判断文件是否存在 isNew文件不需要删除并持久化
+    if(files[id].isNew){
+      const { [id]: value, ...afterDelete } = files
+      //delete files[id]
+      setFiles(afterDelete)
+    } else {
+      fileHelper.deleteFile( files[id].path).then(() => {
+        const { [id]: value, ...afterDelete } = files
+        //delete files[id]
+        setFiles(afterDelete)
+        //持久化文件到本地
+        saveFilesToStore(files)
+        //同时关闭tab页签
+        tabClose(id)
+      })
+    }
   }
   //左侧菜单---编辑文件名称
   const saveEdit = (id, title, isNew) => {
@@ -110,7 +118,7 @@ function App() {
     }else{
       //非新创建文件及执行重命名操作
       const oldPath = join(saveLocation, `${files[id].title}.md`)
-      fileHelper.renameFile(oldPath,newPath).then(() => {
+      fileHelper.renameFile(oldPath, newPath).then(() => {
         setFiles(newFiles)
         //持久化文件
         saveFilesToStore(newFiles)
@@ -131,6 +139,25 @@ function App() {
     }
     setFiles({ ...files, [uuid]: newFile })
   }
+  //左侧菜单---导入文件
+  const importFiles = () => {
+    remote.dialog.showOpenDialog({
+      //选择导入文件
+      title: '选择 .md 格式文件导入',
+      properties: ['openFile', 'multiSelections'],
+      filters: [
+        { name: 'Markdown files', extensions: ['md'] }
+      ]
+    }, (paths) => {
+      if (Array.isArray(paths)){
+        //过滤已经存在的文件
+
+        //扩展完善路径数组
+
+      }
+    })
+  }
+
   //右侧tab页---点击右侧tab页签方法
   const tabClick= (fileId) => {
     //设置活跃文件id
@@ -206,6 +233,7 @@ function App() {
                   text = "导入"
                   colorClass="btn-success"
                   icon = {faFileImport}
+                  onBtnClick = {importFiles}
                 />
               </div> 
             </div>
