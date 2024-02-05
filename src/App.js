@@ -12,10 +12,10 @@ import TabList from './components/TabList';
 import fileHelper from './utils/fileHelper';
 import { flattenArr, objToArr } from './utils/helper'
 import { v4 as uuidv4 } from 'uuid';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const { join, basename, extname, dirname } = window.require('path') //文件路径
-const { remote } = window.require('electron')//remote是electron提供的renderer.js可以访问node.js方法
+const { remote, ipcRenderer } = window.require('electron')//remote是electron提供的renderer.js可以访问node.js方法
 const Store = window.require('electron-store') //electron提供的数据持久化类
 const fileStore = new Store({'name': 'Files-Store-Data'})//实例化electron-store 设置本机存储文件
 //保存文件至store中(文档数据库)
@@ -246,6 +246,16 @@ function App() {
     })
   }
 
+  useEffect(() => {
+    const callback = () => {
+
+    }
+    ipcRenderer.on('create-new-file', callback)
+    return () => {
+      ipcRenderer.removeListener('create-new-file', callback)
+    }
+  })
+
   return (
     //container-fluid 栅格布局以12划分 根据编辑器布局定义raw 
     <div className="App container-fluid px-0">  
@@ -283,7 +293,10 @@ function App() {
         <div className="col-9 right-panel">
           { !activeFile &&
             <div className='start-page'>
-                请点击打开文档或创建新文档
+                <div>请点击打开文档或创建新文档</div>
+                <div>新建 Ctrl + N</div>
+                <div>保存 Ctrl + S</div>
+                <div>导入 Ctrl + O</div>
               </div>
           }
           { activeFile &&

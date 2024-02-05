@@ -22,21 +22,25 @@
 }
 
 .start-page {
-  font-size: 30px;
-  height: 300px;
-  line-height: 300px;
+  font-size: 20px;
+  position:relative;/*相对定位*/
+  top:30%;/*向下移动自身高度的一半 */
+  transform:translateY(-50%);/*再向上移动自身高度的一半，达到:text-align:center;/*文本水平居中 */
   color: #a2a0a0;
   text-align: center;
 }
+
 .left-panel {
   min-height: 100vh;
   position: relative;
 }
+
 .button-group {
   position: absolute;
   width: 100%;
   bottom: 0;
 }
+
 .no-border {
   border-radius: 0 !important;
 }
